@@ -67,7 +67,7 @@ git submodule update
 libtoolize
 ./autogen.sh --prefix=$INSTALL_PREFIX --libdir=$INSTALL_LIB_DIR CXXFLAGS=-std=c++11
 ./autogen.sh --prefix=$INSTALL_PREFIX --libdir=$INSTALL_LIB_DIR CXXFLAGS=-std=c++11
-make -j4
+make
 sudo make install
 export LD_LIBRARY_PATH=$INSTALL_LIB_DIR
 export PKG_CONFIG_PATH=$INSTALL_LIB_DIR/pkgconfig:$PKG_CONFIG_PATH
@@ -82,7 +82,7 @@ git submodule update
 libtoolize
 ./autogen.sh --prefix=$INSTALL_PREFIX --libdir=$INSTALL_LIB_DIR CXXFLAGS=-std=c++11
 ./autogen.sh --prefix=$INSTALL_PREFIX --libdir=$INSTALL_LIB_DIR CXXFLAGS=-std=c++11
-make -j4
+make
 sudo make install
 cd $ROOT_GST_DIR
 
@@ -94,7 +94,7 @@ git submodule update
 libtoolize
 ./autogen.sh --prefix=$INSTALL_PREFIX --libdir=$INSTALL_LIB_DIR CXXFLAGS=-std=c++11
 ./autogen.sh --prefix=$INSTALL_PREFIX --libdir=$INSTALL_LIB_DIR CXXFLAGS=-std=c++11
-make -j4
+make
 sudo make install
 cd ..
 
@@ -106,7 +106,7 @@ git submodule update
 libtoolize
 ./autogen.sh --prefix=$INSTALL_PREFIX --libdir=$INSTALL_LIB_DIR CXXFLAGS=-std=c++11
 ./autogen.sh --prefix=$INSTALL_PREFIX --libdir=$INSTALL_LIB_DIR CXXFLAGS=-std=c++11
-make -j4
+make
 sudo make install
 cd ..
 
@@ -155,9 +155,9 @@ cd $ROOT_DIR
 
 if [ "$ARCHITECTURE" = "aarch64" ]; then
   patchelf --set-rpath $INSTALL_LIB_DIR ${ROOT_DIR}/libs/jetson/debug/libteevid_sdk.so
-  #patchelf --set-rpath $INSTALL_LIB_DIR ${ROOT_DIR}/libs/jetson/release/libteevid_sdk.so
+  patchelf --set-rpath $INSTALL_LIB_DIR ${ROOT_DIR}/libs/jetson/release/libteevid_sdk.so
 else
   patchelf --set-rpath $INSTALL_LIB_DIR ${ROOT_DIR}/libs/desktop/debug/libteevid_sdk.so
-  #patchelf --set-rpath $INSTALL_LIB_DIR ${ROOT_DIR}/libs/desktop/release/libteevid_sdk.so
+  patchelf --set-rpath $INSTALL_LIB_DIR ${ROOT_DIR}/libs/desktop/release/libteevid_sdk.so
 fi
 

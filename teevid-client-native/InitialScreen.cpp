@@ -7,6 +7,8 @@
 #include "ConnectParamsDialog.h"
 #include "InvitationManager.h"
 
+#include "teevid_sdk/RoomParameters.h"
+
 #include <QButtonGroup>
 #include <QStandardItemModel>
 #include <QMessageBox>
@@ -64,15 +66,20 @@ void InitialScreen::InitSDK()
     try
     {
         teeVidClient_ = TeeVidFactory::CreateTeeVidClient();
-        teeVidClient_->Initialize(validationToken, teevidServer, (ITeeVidClientObserver*)this);
 
-        TeeVidSettings settings;
-        settings.media_settings.audioSettings.audioChannels = kStereo;
-        settings.media_settings.audioSettings.audioBpsType = kS16LE;
-        settings.media_settings.audioSettings.audioSampleRate = cAudioSampleRate;
-        settings.media_settings.videoSettings.videoFormatType = VideoFormatType::kRGBA;
-        settings.media_settings.videoSettings.videoFps = cVideoFps;
-        teeVidClient_->Configure(settings);
+        // TODO: set desired logging level
+        // if you need no SDK signalling traces - set any level except DEBUG
+        teeVidClient_->Initialize(validationToken, teevidServer, LogLevel::DEBUG, (ITeeVidClientObserver*)this);
+
+        // TODO: uncomment this if default configuration is required
+//        TeeVidSettings settings;
+//        settings.media_settings.audioSettings.audioChannels = kStereo;
+//        settings.media_settings.audioSettings.audioBpsType = kS16LE;
+//        settings.media_settings.audioSettings.audioSampleRate = cAudioSampleRate;
+//        settings.media_settings.videoSettings.videoFormatType = VideoFormatType::kRGBA;
+//        settings.media_settings.videoSettings.videoFps = cVideoFps;
+//        teeVidClient_->Configure(settings);
+
     }
     catch (std::exception& e)
     {
@@ -153,6 +160,8 @@ void InitialScreen::InitUI()
     ui->checkBoxLocalVideo->setChecked(true);
     connect(ui->checkBoxLocalVideo, SIGNAL(stateChanged(int)), this, SLOT(onDisplayLocalVideoChecked(int)));
 
+    //
+    connect(this, SIGNAL(roomConnectReceived(int, int)), this, SLOT(OnRoomConnectReceived(int, int)));
     connect(this, SIGNAL(sdkOnConnectedRecieved(QString)), this, SLOT(OnSdkOnConnectedReceived(QString)));
 
     _connectParamsDialog = new ConnectParamsDialog(this);
@@ -162,7 +171,7 @@ void InitialScreen::InitUI()
     connect(_connectParamsDialog, SIGNAL(paramsCancelled()), this, SLOT(onConnectParamsCancelled()));
 
     // TODO: should it be called only at first successful publish?
-    GenerateDummyVideoFrames();
+    // currently only audio frames are generated here
     GenerateDummyAudioFrames();
 
     _dummyFramesTimer.setInterval(cVideoTimerInterval);
@@ -213,6 +222,27 @@ void InitialScreen::OnConnected (long streamId, const std::string& invitationTok
 
 void InitialScreen::OnConnectionError (const std::string& )
 {
+}
+
+void InitialScreen::OnRoomConnected(const RoomParameters &roomParameters)
+{
+    int videoWidth = roomParameters.video_resolution_.width;
+    int videoHeight = roomParameters.video_resolution_.height;
+
+    if (teeVidClient_)
+    {
+        TeeVidSettings settings;
+        settings.media_settings.audioSettings.audioChannels = kStereo;
+        settings.media_settings.audioSettings.audioBpsType = kS16LE;
+        settings.media_settings.audioSettings.audioSampleRate = cAudioSampleRate;
+        settings.media_settings.videoSettings.videoFormatType = VideoFormatType::kRGBA;
+        settings.media_settings.videoSettings.videoWidth = videoWidth;
+        settings.media_settings.videoSettings.videoHeight = videoHeight;
+        settings.media_settings.videoSettings.videoFps = cVideoFps;
+        teeVidClient_->Configure(settings);
+    }
+
+    emit roomConnectReceived(videoWidth, videoHeight);
 }
 
 void InitialScreen::OnStreamAdded (long streamId, const std::string& name, const std::string& participantId, int type, bool isLocal, int order, const Participant::Status &status)
@@ -363,7 +393,6 @@ void InitialScreen::onInvitePressed()
     int accessPin = _connectParamsDialog->GetAccessPin();
     try
     {
-         _dummyFramesTimer.start();
         teeVidClient_->ConnectTo(room, user, password, accessPin, 0);
     }
     catch (std::exception& e)
@@ -459,7 +488,6 @@ void InitialScreen::onRoomSubmitted(const QString &caller, const QString &invita
     {
         try
         {
-            _dummyFramesTimer.start();
             std::string user = _connectParamsDialog->GetUser().toStdString();
             std::string password = _connectParamsDialog->GetPassword().toStdString();
             teeVidClient_->ConnectTo(inviteParams.token_, inviteParams.room_, user, password);
@@ -485,6 +513,12 @@ void InitialScreen::onDisplayLocalVideoChecked(int state)
 {
     bool showVideo = (state == Qt::Checked);
     ui->frameLocalVideo->setVisible(showVideo);
+}
+
+void InitialScreen::OnRoomConnectReceived(int videoWidth, int videoHeight)
+{
+    GenerateDummyVideoFrames(videoWidth, videoHeight);
+    _dummyFramesTimer.start();
 }
 
 void InitialScreen::OnSdkOnConnectedReceived(QString token)
@@ -581,12 +615,12 @@ CallItemVideoView* InitialScreen::GetVideoViewById(long streamId) const
 }
 
 
-void InitialScreen::GenerateDummyVideoFrames()
+void InitialScreen::GenerateDummyVideoFrames(int width, int height)
 {
     _videoFrames.clear();
     for (unsigned char i = 0; i < cDummyFrameSetsCount; ++i)
     {
-        _videoFrames.push_back(std::make_shared<VideoFrameData>(i));
+        _videoFrames.push_back(std::make_shared<VideoFrameData>(i, width, height));
     }
 }
 

@@ -42,6 +42,7 @@ public:
 
     void OnConnected (long streamId, const std::string& invitationToken) override;
     void OnConnectionError (const std::string& reason) override;
+    void OnRoomConnected(const RoomParameters &roomParameters) override;
     void OnStreamAdded (long streamId, const std::string& name, const std::string& participantId, int type, bool isLocal, int order, const Participant::Status& status) override;
     void OnStreamRemoved(long streamId) override;
     void OnDisconnected () override;
@@ -56,6 +57,7 @@ public:
     void OnRaiseHandStatusUpdated (bool allowed) override;
 
 signals:
+    void roomConnectReceived(int videoWidth, int videoHeight);
     void sdkOnConnectedRecieved(QString token);
 
 protected slots:
@@ -79,6 +81,7 @@ protected slots:
 
     void onDisplayLocalVideoChecked(int state);
 
+    void OnRoomConnectReceived(int videoWidth, int videoHeight);
     void OnSdkOnConnectedReceived(QString token);
 
     void OnDummyFrameTimer();
@@ -88,7 +91,7 @@ protected:
 
     CallItemVideoView* GetVacantVideoView() const;
     CallItemVideoView* GetVideoViewById(long streamId) const;
-    void GenerateDummyVideoFrames();
+    void GenerateDummyVideoFrames(int width, int height);
     void GenerateDummyAudioFrames();
 
 private:

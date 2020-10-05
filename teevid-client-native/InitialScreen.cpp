@@ -44,7 +44,7 @@ InitialScreen::InitialScreen(QWidget *parent) : QWidget(parent), ui(new Ui::Init
     InitUI();
     //InitSDK();
 
-    _publishVideoSettings.videoFormatType = VideoFormatType::kI420;
+    _publishVideoSettings.videoFormatType = VideoFormatType::kUYVY;
 
     _subscribeVideoSettings.videoFormatType = VideoFormatType::kRGBA;
 

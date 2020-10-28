@@ -49,11 +49,7 @@ void CallItemVideoView::setStreamId(long id)
     _streamId = id;
     if (_streamId == 0)
     {
-        setImage(QImage());
-        ui->labelSize->clear();
-        ui->labelAudio->clear();
-        ui->labelVideo->clear();
-        ui->labelOrder->clear();
+        clear();
     }
 }
 
@@ -171,6 +167,11 @@ void CallItemVideoView::clear()
 {
     // set an empty image
     setImage(QImage());
+    ui->labelSize->clear();
+    ui->labelAudio->clear();
+    ui->labelVideo->clear();
+    ui->labelOrder->clear();
+    ui->labelParticipant->clear();
 }
 
 void CallItemVideoView::setAudioMuted(bool muted)

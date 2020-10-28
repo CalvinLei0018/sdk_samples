@@ -98,7 +98,7 @@ void InitialScreen::InitSDK()
 
         // TODO: set desired logging level
         // if you need no SDK signalling traces - set any level except DEBUG
-        teeVidClient_->Initialize(validationToken, teevidServer, LogLevel::DEBUG, (ITeeVidClientObserver*)this);
+        teeVidClient_->Initialize(validationToken, teevidServer, LogLevel::INFO, (ITeeVidClientObserver*)this);
 
         // TODO: uncomment this if default configuration is required
 //        TeeVidSettings settings;
@@ -518,6 +518,14 @@ void InitialScreen::onBtnEndCallPressed()
     // Please note: this should be called AFTER disconnection from TeeVidClient !!!
     _deviceVideoMgr.Stop();
     _deviceAudioMgr.Stop();
+
+    // this is a clean-up - just in case some artifacts were left
+    ui->frameCallPart_Local->clear();
+    for (auto iter = callItems_.begin(); iter != callItems_.end(); ++iter)
+    {
+        CallItemVideoView* callItem = *iter;
+        callItem->clear();
+    }
 
     QMessageBox mb(QMessageBox::Information, "Invitation", "Call ended");
     mb.exec();

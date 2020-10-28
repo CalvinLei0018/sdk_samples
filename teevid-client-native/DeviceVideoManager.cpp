@@ -5,8 +5,9 @@
 
 const int cDefaultWidth = 1280;
 const int cDefaultHeight = 720;
+const int cRetryCount = 2;
 
-DeviceVideoManager::DeviceVideoManager(QObject *parent) : QObject(parent)
+DeviceVideoManager::DeviceVideoManager(QObject *parent) : QObject(parent), _retryCount(cRetryCount)
 {
 }
 
@@ -88,7 +89,7 @@ bool DeviceVideoManager::Start(int width, int height, const std::string &format)
 
     std::string pipelineStr = "v4l2src device=/dev/video0 ! video/x-raw,width=";
                     pipelineStr += std::to_string(_width) + ",height=" + std::to_string(_height) +
-                    " ! videoconvert ! video/x-raw,format=" + _publishFormat +
+                    " ! videoconvert n-threads=4 ! video/x-raw,format=" + _publishFormat +
                     " ! appsink drop=true max-buffers=60 name=appsink0";
 
     qDebug() << QString::fromStdString(pipelineStr);
@@ -149,6 +150,7 @@ void DeviceVideoManager::Stop()
     _pipeline = NULL;
     _loop = NULL;
     _bus_watch_id = 0;
+    _retryCount = cRetryCount;
 }
 
 void DeviceVideoManager::StartVideo()

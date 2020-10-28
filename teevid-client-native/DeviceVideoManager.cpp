@@ -134,22 +134,7 @@ bool DeviceVideoManager::Start(int width, int height, const std::string &format)
 
 void DeviceVideoManager::Stop()
 {
-    if (_pipeline == NULL || _loop == NULL)
-    {
-        // to ensure the stop is not called several times
-        return;
-    }
-
-    gst_element_set_state(_pipeline, GST_STATE_NULL);
-    g_main_loop_quit(_loop);
-
-    gst_object_unref(GST_OBJECT(_pipeline));
-    g_source_remove(_bus_watch_id);
-    g_main_loop_unref(_loop);
-
-    _pipeline = NULL;
-    _loop = NULL;
-    _bus_watch_id = 0;
+    StopInternal();
     _retryCount = cRetryCount;
 }
 
@@ -182,6 +167,26 @@ void DeviceVideoManager::GstTimerFunc()
     {
         g_main_loop_run(_loop);
     }
+}
+
+void DeviceVideoManager::StopInternal()
+{
+    if (_pipeline == NULL || _loop == NULL)
+    {
+        // to ensure the stop is not called several times
+        return;
+    }
+
+    gst_element_set_state(_pipeline, GST_STATE_NULL);
+    g_main_loop_quit(_loop);
+
+    gst_object_unref(GST_OBJECT(_pipeline));
+    g_source_remove(_bus_watch_id);
+    g_main_loop_unref(_loop);
+
+    _pipeline = NULL;
+    _loop = NULL;
+    _bus_watch_id = 0;
 }
 
 void DeviceVideoManager::PullBuffer(eVideoType type)
@@ -220,6 +225,6 @@ void DeviceVideoManager::PullBuffer(eVideoType type)
 
 void DeviceVideoManager::Retry()
 {
-    Stop();
+    StopInternal();
     Start(cDefaultWidth, cDefaultHeight, _publishFormat);
 }

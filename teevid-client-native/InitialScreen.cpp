@@ -117,7 +117,7 @@ void InitialScreen::InitSDK()
 
         // TODO: set desired logging level
         // if you need no SDK signalling traces - set any level except DEBUG
-        teeVidClient_->Initialize(validationToken, teevidServer, LogLevel::INFO, (ITeeVidClientObserver*)this);
+        teeVidClient_->Initialize(validationToken, teevidServer, LogLevel::DEBUG, (ITeeVidClientObserver*)this);
 
         // TODO: uncomment this if default configuration is required
 //        TeeVidSettings settings;

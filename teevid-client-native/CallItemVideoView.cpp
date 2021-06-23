@@ -103,9 +103,18 @@ void printLog(const char* text)
 }
 void CallItemVideoView::OnVideoFrame(unsigned char *data, size_t size, size_t stride, VideoOrientation orientation)
 {
+    bool isLocal = _participantName.contains("Local");
+    if (!isLocal)
+    {
+        qDebug() << "OnVideoFrame - remote stream. size =" << size << " stride =" << stride;
+    }
     // TODO: check whether this could be parallel
     if (_videoMuted || !data || stride <= 0)
     {
+        if (!isLocal)
+        {
+            qCritical() << "Video frame is incorrect";
+        }
         //printf("DEBUG. OnVideoFrame: _videoMuted || !data");
         return;
     }

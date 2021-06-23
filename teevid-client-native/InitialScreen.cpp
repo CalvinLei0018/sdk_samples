@@ -338,6 +338,7 @@ void InitialScreen::OnRoomConnected(const RoomParameters &roomParameters)
 
 void InitialScreen::OnStreamAdded (long streamId, const std::string& name, const std::string& participantId, int type, bool isLocal, int order, const Participant::Status &status)
 {
+    std::cout << "OnStreamAdded:\nstreamId = " << streamId << "\nname: " << name << "\nparticipantId: " << participantId << "\nisLocal: " << isLocal << "\norder: " << order << "\n\n";
     if (isLocal)
     {
         ui->frameCallPart_Local->setStreamId(streamId);
@@ -358,6 +359,10 @@ void InitialScreen::OnStreamAdded (long streamId, const std::string& name, const
             callItem->setAudioSampleRate(_subscribeSettings.audioSettings.audioSampleRate);
 
             teeVidClient_->Subscribe(streamId, _subscribeSettings, callItem);
+        }
+        else
+        {
+            qCritical() << "ERROR: cannot subscribe to stream";
         }
     }
 }

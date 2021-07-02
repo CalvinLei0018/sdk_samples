@@ -57,6 +57,27 @@ typedef enum {
 
 typedef enum
 {
+  TopLeft = 0,
+  TopRight = 1,
+  BottomLeft = 2,
+  BottomRight = 3
+} eWatermarkPosition;
+
+struct WatermarkOptions
+{
+  std::string imageFileName;
+  int width = 0;
+  int height = 0;
+
+  int offset_x = 0;
+  int offset_y = 0;
+  eWatermarkPosition position = eWatermarkPosition::TopLeft;
+
+  double alpha = 1;
+};
+
+typedef enum
+{
   kNone,               // Identity (no rotation)
   kCounterClockwise,   // Rotate counter-clockwise 90 degrees
   kRotate180,          // Rotate 180 degrees
@@ -93,6 +114,9 @@ struct VideoSettings
   // available only for INTERNAL pipeline mode and ONLY for EMBEDDED architecture
   // disabled by default
   bool allowMJPG = false;
+
+  bool useWatermark = false;
+  WatermarkOptions watermarkOptions;
 
   FlipMethod flipMethod;
   CropSettings cropSettings;

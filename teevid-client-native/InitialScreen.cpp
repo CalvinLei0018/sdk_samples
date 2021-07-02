@@ -52,6 +52,15 @@ InitialScreen::InitialScreen(QWidget *parent) : QWidget(parent), ui(new Ui::Init
     _publishSettings.videoSettings.videoFps = cVideoFps;
     _publishSettings.videoSettings.allowMJPG = false;
 
+//    _publishSettings.videoSettings.useWatermark = true;
+//    _publishSettings.videoSettings.watermarkOptions.imageFileName = "/home/username/watermark.png";
+//    _publishSettings.videoSettings.watermarkOptions.width = 270;
+//    _publishSettings.videoSettings.watermarkOptions.height = 240;
+//    _publishSettings.videoSettings.watermarkOptions.offset_x = 20;
+//    _publishSettings.videoSettings.watermarkOptions.offset_y = 20;
+//    _publishSettings.videoSettings.watermarkOptions.position = eWatermarkPosition::BottomLeft;
+//    _publishSettings.videoSettings.watermarkOptions.alpha = 0.5;
+
     _publishSettings.audioSettings.audioChannels = kStereo;
     _publishSettings.audioSettings.audioBpsType = kS16LE;
     _publishSettings.audioSettings.audioSampleRate = cAudioPublishSampleRate;
@@ -538,7 +547,7 @@ void InitialScreen::onInvitePressed()
     {
         bool sendAudio = isMicrophoneOn();
         bool sendVideo = isCameraOn();
-        teeVidClient_->ConnectTo(room, user, password, accessPin, 0, sendAudio, sendVideo, nullptr);
+        teeVidClient_->ConnectTo(room, user, password, accessPin, 0, sendAudio, sendVideo, this);
     }
     catch (std::exception& e)
     {
@@ -654,7 +663,7 @@ void InitialScreen::onRoomSubmitted(const QString &caller, const QString &invita
             std::string password = _connectParamsDialog->GetPassword().toStdString();
             bool sendAudio = isMicrophoneOn();
             bool sendVideo = isCameraOn();
-            teeVidClient_->ConnectTo(inviteParams.token_, inviteParams.room_, user, password, sendAudio, sendVideo, nullptr);
+            teeVidClient_->ConnectTo(inviteParams.token_, inviteParams.room_, user, password, sendAudio, sendVideo, this);
         }
         catch (std::exception& e)
         {

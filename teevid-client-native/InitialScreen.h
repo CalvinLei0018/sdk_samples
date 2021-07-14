@@ -45,7 +45,7 @@ public:
 
     void OnConnected (long streamId, const std::string& invitationToken) override;
     void OnRoomConnected(const RoomParameters &roomParameters) override;
-    void OnStreamAdded (long streamId, const std::string& name, const std::string& participantId, int type, bool isLocal, int order, const Participant::Status& status) override;
+    void OnStreamAdded (long streamId, const std::string& name, const std::string& participantId, StreamType type, bool isLocal, int order, const Participant::Status& status) override;
     void OnStreamRemoved(long streamId) override;
     void OnDisconnected () override;
     void OnRoomModeChanged (RoomMode mode) override;
@@ -57,6 +57,8 @@ public:
     void OnMuteAttributesUpdated (const MuteAttributes& muteAttr) override;
     void OnParticipantUpdated (const std::string& participantId, const MuteAttributes& muteAttr) override;
     void OnRaiseHandStatusUpdated (bool allowed) override;
+    void OnScreenStarted () override;
+    void OnScreenStopped (const std::string& reason) override;
 
     // IFrameModifier
     void OnVideoSourceFrame (unsigned char *data, size_t size, size_t stride) override;

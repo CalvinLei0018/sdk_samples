@@ -52,6 +52,18 @@ InitialScreen::InitialScreen(QWidget *parent) : QWidget(parent), ui(new Ui::Init
     _publishSettings.videoSettings.videoFps = cVideoFps;
     _publishSettings.videoSettings.allowMJPG = false;
 
+    _publishSettings.videoSettings.useWatermark = true;
+    _publishSettings.videoSettings.watermarkOptions.imageFileName = "/home/username/watermark.png";
+    _publishSettings.videoSettings.watermarkOptions.width = 270;
+    _publishSettings.videoSettings.watermarkOptions.height = 240;
+    _publishSettings.videoSettings.watermarkOptions.offset_x = 20;
+    _publishSettings.videoSettings.watermarkOptions.offset_y = 20;
+    _publishSettings.videoSettings.watermarkOptions.position = eWatermarkPosition::BottomLeft;
+    _publishSettings.videoSettings.watermarkOptions.alpha = 0.5;
+
+//    _publishSettings.videoSettings.sourceWidth = 1920;
+//    _publishSettings.videoSettings.sourceHeight = 1080;
+
     _publishSettings.audioSettings.audioChannels = kStereo;
     _publishSettings.audioSettings.audioBpsType = kS16LE;
     _publishSettings.audioSettings.audioSampleRate = cAudioPublishSampleRate;
@@ -226,7 +238,7 @@ void InitialScreen::InitUI()
 //    _dummyAudioFramesTimer.setSingleShot(false);
 //    connect(&_dummyAudioFramesTimer, SIGNAL(timeout()), this, SLOT(OnDummyAudioFrameTimer()));
 
-    ui->frameCallPart_Local->setDirectVideoRendering(false);
+    ui->frameCallPart_Local->setDirectVideoRendering(true);
     _publishSettings.previewWindowId = ui->frameCallPart_Local->_subscribeSettings.previewWindowId;
 
     ui->frameCallPart_1->setDirectVideoRendering(false);
@@ -347,7 +359,7 @@ void InitialScreen::OnRoomConnected(const RoomParameters &roomParameters)
     }
 }
 
-void InitialScreen::OnStreamAdded (long streamId, const std::string& name, const std::string& participantId, int type, bool isLocal, int order, const Participant::Status &status)
+void InitialScreen::OnStreamAdded (long streamId, const std::string& name, const std::string& participantId, StreamType type, bool isLocal, int order, const Participant::Status &status)
 {
     if (isLocal)
     {
@@ -470,6 +482,16 @@ void InitialScreen::OnParticipantUpdated (const std::string& , const MuteAttribu
 void InitialScreen::OnRaiseHandStatusUpdated (bool ){
 }
 
+void InitialScreen::OnScreenStarted()
+{
+
+}
+
+void InitialScreen::OnScreenStopped(const std::string &reason)
+{
+
+}
+
 void InitialScreen::onConnectParamsApplied()
 {
     InitSDK();
@@ -538,7 +560,7 @@ void InitialScreen::onInvitePressed()
     {
         bool sendAudio = isMicrophoneOn();
         bool sendVideo = isCameraOn();
-        teeVidClient_->ConnectTo(room, user, password, accessPin, 0, sendAudio, sendVideo, nullptr);
+        teeVidClient_->ConnectTo(room, user, password, accessPin, 0, sendAudio, sendVideo, this);
     }
     catch (std::exception& e)
     {
@@ -654,7 +676,7 @@ void InitialScreen::onRoomSubmitted(const QString &caller, const QString &invita
             std::string password = _connectParamsDialog->GetPassword().toStdString();
             bool sendAudio = isMicrophoneOn();
             bool sendVideo = isCameraOn();
-            teeVidClient_->ConnectTo(inviteParams.token_, inviteParams.room_, user, password, sendAudio, sendVideo, nullptr);
+            teeVidClient_->ConnectTo(inviteParams.token_, inviteParams.room_, user, password, sendAudio, sendVideo, this);
         }
         catch (std::exception& e)
         {

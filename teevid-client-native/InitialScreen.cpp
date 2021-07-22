@@ -34,7 +34,7 @@ const int cAudioPublishSampleRate = 48000;
 const int cAudioSubscribeSampleRate = 48000;
 const int cMaxAudioSetsCount = 512;
 
-const QString cSourceDir = "hisense-demo";
+const QString cSourceDir = "teevid-client-native";
 
 // choose audio sample file
 const QString cAudioSampleFile = "audio-sample-48000.wav";

@@ -34,7 +34,7 @@ const int cAudioPublishSampleRate = 48000;
 const int cAudioSubscribeSampleRate = 48000;
 const int cMaxAudioSetsCount = 512;
 
-const QString cSourceDir = "teevid-client-native";
+const QString cSourceDir = "hisense-demo";
 
 // choose audio sample file
 const QString cAudioSampleFile = "audio-sample-48000.wav";
@@ -89,7 +89,7 @@ InitialScreen::~InitialScreen()
     if(_screenPublishSettings.sourceMode == kExternalSourceMode)
     {
         _screenVideoMgr.Stop();
-//        _screenAudioMgr.Stop();
+        _screenAudioMgr.Stop();
     }
 
     if(_webcamPublishSettings.sourceMode == kExternalSourceMode)
@@ -261,26 +261,26 @@ void InitialScreen::InitUI()
 
     if(_webcamPublishSettings.sourceMode == kExternalSourceMode)
     {
-        connect(&_webcamVideoMgr, SIGNAL(publishVideoFrame(unsigned char*,long,int,bool)), this, SLOT(OnPublishVideoFrame(unsigned char*,long,int,bool)));
-        connect(&_webcamVideoMgr, SIGNAL(internalVideoFrame(unsigned char*,long,int,bool)), this, SLOT(OnInternalVideoFrame(unsigned char*,long,int,bool)));
+        connect(&_webcamVideoMgr, SIGNAL(publishVideoFrame(unsigned char*, long, int, bool)), this, SLOT(OnPublishVideoFrame(unsigned char*, long, int, bool)));
+        connect(&_webcamVideoMgr, SIGNAL(internalVideoFrame(unsigned char*, long, int, bool)), this, SLOT(OnInternalVideoFrame(unsigned char*, long, int, bool)));
         connect(&_webcamVideoMgr, SIGNAL(videoError(QString, bool)), this, SLOT(OnVideoError(QString, bool)));
         connect(&_webcamVideoMgr, SIGNAL(videoStarted(int, int, bool)), this, SLOT(OnVideoStarted(int, int, bool)));
         connect(&_webcamVideoMgr, SIGNAL(capsUpdated(int, int, int, bool)), this, SLOT(OnVideoCapsUpdated(int, int, int, bool)));
 
-        connect(&_webcamAudioMgr, SIGNAL(audioFrame(unsigned char*,long)), this, SLOT(OnAudioFrame(unsigned char*,long)));
-        connect(&_webcamAudioMgr, SIGNAL(audioError(QString)), this, SLOT(OnAudioError(QString)));
+        connect(&_webcamAudioMgr, SIGNAL(audioFrame(unsigned char*,long,bool)), this, SLOT(OnAudioFrame(unsigned char*,long,bool)));
+        connect(&_webcamAudioMgr, SIGNAL(audioError(QString, bool)), this, SLOT(OnAudioError(QString, bool)));
     }
 
     if(_screenPublishSettings.sourceMode == kExternalSourceMode)
     {
-        connect(&_screenVideoMgr, SIGNAL(publishVideoFrame(unsigned char*,long,int,bool)), this, SLOT(OnPublishVideoFrame(unsigned char*,long,int,bool)));
-        connect(&_screenVideoMgr, SIGNAL(internalVideoFrame(unsigned char*,long,int,bool)), this, SLOT(OnInternalVideoFrame(unsigned char*,long,int,bool)));
+        connect(&_screenVideoMgr, SIGNAL(publishVideoFrame(unsigned char*, long, int, bool)), this, SLOT(OnPublishVideoFrame(unsigned char*, long, int, bool)));
+        connect(&_screenVideoMgr, SIGNAL(internalVideoFrame(unsigned char*, long, int, bool)), this, SLOT(OnInternalVideoFrame(unsigned char*, long, int, bool)));
         connect(&_screenVideoMgr, SIGNAL(videoError(QString, bool)), this, SLOT(OnVideoError(QString, bool)));
         connect(&_screenVideoMgr, SIGNAL(videoStarted(int, int, bool)), this, SLOT(OnVideoStarted(int, int, bool)));
         connect(&_screenVideoMgr, SIGNAL(capsUpdated(int, int, int, bool)), this, SLOT(OnVideoCapsUpdated(int, int, int, bool)));
 
-//        connect(&_screenAudioMgr, SIGNAL(audioFrame(unsigned char*,long)), this, SLOT(OnAudioFrame(unsigned char*,long)));
-//        connect(&_screenAudioMgr, SIGNAL(audioError(QString)), this, SLOT(OnAudioError(QString)));
+        connect(&_screenAudioMgr, SIGNAL(audioFrame(unsigned char*, long, bool)), this, SLOT(OnAudioFrame(unsigned char*, long, bool)));
+        connect(&_screenAudioMgr, SIGNAL(audioError(QString, bool)), this, SLOT(OnAudioError(QString, bool)));
     }
 }
 
@@ -632,7 +632,7 @@ void InitialScreen::onBtnEndCallPressed()
     {
         // Please note: this should be called AFTER disconnection from TeeVidClient !!!
         _screenVideoMgr.Stop();
-        //_webcamAudioMgr.Stop();
+        //_screenAudioMgr.Stop();
     }
 
     if(_webcamPublishSettings.sourceMode == kExternalSourceMode)
@@ -713,10 +713,7 @@ void InitialScreen::onBtnScreenSharePressed()
                 if(_screenPublishSettings.sourceMode == kExternalSourceMode)
                 {
                     _screenVideoMgr.Start(videoFormat, options);
-//                    _screenVideoMgr.Start(cAudioFps,
-//                                          _webcamPublishSettings.audioSettings.audioSampleRate,
-//                                          _webcamPublishSettings.audioSettings.audioChannels,
-//                                          GetAudioFormatName(_webcamPublishSettings.audioSettings));
+                    _screenAudioMgr.Start(GetAudioFormatName(_webcamPublishSettings.audioSettings));
                 }
 
                 teeVidClient_->StartScreenSharing(_screenPublishSettings);
@@ -988,15 +985,16 @@ void InitialScreen::OnVideoCapsUpdated(int width, int height, int fps, bool scre
     }
 }
 
-void InitialScreen::OnAudioFrame(unsigned char *data, long size)
+void InitialScreen::OnAudioFrame(unsigned char *data, long size, bool screenSharing)
 {
     if (teeVidClient_)
     {
-        teeVidClient_->PutAudioFrame(data, size);
+        StreamType streamType = screenSharing ? eScreen : eWebCam;
+        teeVidClient_->PutAudioFrame(data, size, streamType);
     }
 }
 
-void InitialScreen::OnAudioError(QString message)
+void InitialScreen::OnAudioError(QString message, bool screenSharing)
 {
     QMessageBox mb(QMessageBox::Critical, "Audio error", message);
     mb.exec();

@@ -104,8 +104,8 @@ protected slots:
     void OnVideoStarted(int width, int height, bool screenSharing);
     void OnVideoCapsUpdated(int width, int height, int fps, bool screenSharing);
 
-    void OnAudioFrame(unsigned char* data, long size);
-    void OnAudioError(QString message);
+    void OnAudioFrame(unsigned char* data, long size, bool screenSharing);
+    void OnAudioError(QString message, bool screenSharing);
 
 protected:
     void UnsubscribeFromVideo();

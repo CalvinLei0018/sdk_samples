@@ -88,7 +88,7 @@ namespace teevid_sdk {
         // Application should provide data in format which has been configured by Configure method
         // In case of video frames the source can be webcam video or desktop sharing
         virtual bool PutVideoFrame(unsigned char *data, size_t size, size_t stride, StreamType eSourceType = eWebCam) = 0;
-        virtual bool PutAudioFrame(unsigned char *data, size_t size) = 0;
+        virtual bool PutAudioFrame(unsigned char *data, size_t size, StreamType eSourceType = eWebCam) = 0;
 
         // Screen sharing alongside webcam video publishing
         // When using an external pipeline no need to specify screen sharing options as they are already applied

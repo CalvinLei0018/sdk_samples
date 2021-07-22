@@ -105,6 +105,7 @@ bool DeviceVideoManager::Start(int width, int height, const std::string &format)
     _width = width;
     _height = height;
     _publishFormat = format;
+    _screenSharing = false;
 
 //    std::string pipelineStr = "v4l2src device=/dev/video0 ! tee name=t ! queue ";
 //               pipelineStr += " ! videoconvert ! videoscale ! video/x-raw,format=" +
